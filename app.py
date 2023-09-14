@@ -44,8 +44,8 @@ def welcome():
         f"/api/v1.0/precipitation<br/>"
         f"/api/v1.0/stations<br/>"
         f"/api/v1.0/tobs<br/>"
-        f"/api/v1.0/start<br/>"
-        f"/api/v1.0/start_end"
+        f"/api/v1.0/<start><br/>"
+        f"/api/v1.0/<start>/<end>"
     )
 
 
@@ -112,16 +112,8 @@ def begining(start=None):
     session = Session(engine)
 
     # Query temperature observations from a given start date to the end of the data set
-    print('Please indicate from which date you would like temperature data:')
-    # year = input('From what year? ')
-    # month = input('From what month? ')
-    # day = input('From what day? ')
+    query_date = dt.datetime.strptime(start, "%m-%d-%Y")
 
-    query_date = dt.datetime.strptime(start, "%m%d%Y")
-
-    # temp_data = engine.execute(text(f'SELECT MIN(tobs), MAX(tobs), AVG(tobs)\
-    # FROM measurement\
-    # WHERE date >= {query_date}')).all()
     select = [func.min(measurement.tobs), func.max(
         measurement.tobs), func.avg(measurement.tobs)]
     temp_data = session.query(
@@ -129,8 +121,7 @@ def begining(start=None):
 
     session.close()
 
-    # Returns the min, max, and average temperatures calculated from
-    # the given start date to the end of the dataset
+    # Returns the min, max, and average temperatures calculated from the given start date to the end of the dataset
     temp_data = list(np.ravel(temp_data))
 
     return jsonify(temp_data=temp_data)
@@ -143,8 +134,8 @@ def start_end(start=None, end=None):
 
     # Accepts the start and end dates as parameters
 
-    start_date = dt.datetime.strptime(start, "%m%d%Y")
-    end_date = dt.datetime.strptime(end, "%m%d%Y")
+    start_date = dt.datetime.strptime(start, "%m-%d-%Y")
+    end_date = dt.datetime.strptime(end, "%m-%d-%Y")
 
     # Queries the min, max, and average of observed temperature in the selected timeframe.
     select = [func.min(measurement.tobs), func.max(
